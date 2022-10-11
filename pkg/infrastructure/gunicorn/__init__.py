@@ -4,6 +4,7 @@ import gunicorn.app.base
 from starlette.types import Receive, Scope, Send
 
 
+# copied from https://docs.gunicorn.org/en/latest/custom.html
 class GunicornApplication(gunicorn.app.base.BaseApplication):
     def __init__(
         self,
