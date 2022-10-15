@@ -5,6 +5,12 @@ from sqlalchemy.sql.elements import ClauseElement
 
 from internal.repository.base import GetRepository, ListRepository
 from internal.usecase.base import GetUseCase, ListUseCase
+from internal.usecase.error_codes import DB_ERROR, NOT_FOUND_ERROR
+from internal.usecase.i18n_messages import (
+    OBJECT_NOT_FOUND_MESSAGE,
+    OBJECTS_NOT_FOUND_MESSAGE,
+)
+from pkg.exceptions import TranslatableException
 from pkg.models.base import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
@@ -28,7 +34,12 @@ class SimpleGetUseCase(GetUseCase[ModelType, FilterInputType]):
         self, ctx: ContextVar[Dict[Any, Any]], filter_input: FilterInputType
     ) -> ModelType:
         filter_clauses = self._filter_input_to_filter_clauses_func(ctx, filter_input)
-        return self._get_repository.get(ctx, *filter_clauses)
+        try:
+            return self._get_repository.get(ctx, *filter_clauses)
+        except Exception as e:
+            raise TranslatableException(
+                e, OBJECT_NOT_FOUND_MESSAGE, _code=NOT_FOUND_ERROR
+            )
 
 
 class SimpleListUseCase(ListUseCase[ModelType, FilterInputType, OrderByInputType]):
@@ -62,6 +73,9 @@ class SimpleListUseCase(ListUseCase[ModelType, FilterInputType, OrderByInputType
         order_by_clauses = self._order_by_input_to_order_by_clauses_func(
             ctx, order_by_input
         )
-        return self._list_repository.list(
-            ctx, filter_clauses, order_by_clauses, offset=offset, limit=limit
-        )
+        try:
+            return self._list_repository.list(
+                ctx, filter_clauses, order_by_clauses, offset=offset, limit=limit
+            )
+        except Exception as e:
+            raise TranslatableException(e, OBJECTS_NOT_FOUND_MESSAGE, _code=DB_ERROR)

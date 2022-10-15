@@ -1,10 +1,14 @@
+import uuid
+
 from sqlalchemy import Boolean, Column, String
 
 from pkg.models.base import Base
 
 
 class User(Base):
-    jwt_token_key = Column(String(), nullable=False, default="")
+    jwt_token_key = Column(
+        String(), nullable=False, default=lambda _: str(uuid.uuid4())
+    )
     password = Column(String(), nullable=True)
     username = Column(String(128), unique=True, nullable=False)
     email = Column(String(128), unique=True, nullable=False)

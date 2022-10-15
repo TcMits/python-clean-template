@@ -3,6 +3,9 @@ from typing import Any, Callable, Dict, TypeVar
 
 from internal.repository.base import UpdateRepository
 from internal.usecase.base import GetAndUpdateUseCase, GetUseCase
+from internal.usecase.error_codes import DB_ERROR
+from internal.usecase.i18n_messages import CAN_NOT_UPDATE_NOW_MESSAGE
+from pkg.exceptions import TranslatableException
 from pkg.models.base import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
@@ -34,4 +37,8 @@ class SimpleGetAndUpdateUseCase(
     ) -> ModelType:
         obj = self._get_use_case.get(ctx, filter_input)
         validated_data = self._validate_func(ctx, obj, update_input)
-        return self._update_repository.update(ctx, obj, validated_data)
+
+        try:
+            return self._update_repository.update(ctx, obj, validated_data)
+        except Exception as e:
+            raise TranslatableException(e, CAN_NOT_UPDATE_NOW_MESSAGE, _code=DB_ERROR)

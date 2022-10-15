@@ -3,6 +3,9 @@ from typing import Any, Dict, TypeVar
 
 from internal.repository.base import DeleteRepository
 from internal.usecase.base import GetAndDeleteUseCase, GetUseCase
+from internal.usecase.error_codes import NOT_FOUND_ERROR
+from internal.usecase.i18n_messages import CAN_NOT_DELETE_NOW_MESSAGE
+from pkg.exceptions import TranslatableException
 from pkg.models.base import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
@@ -25,4 +28,10 @@ class SimpleGetAndDeleteUseCase(GetAndDeleteUseCase[ModelType, FilterInputType])
         filter_input: FilterInputType,
     ) -> None:
         obj = self._get_use_case.get(ctx, filter_input)
-        self._delete_repository.delete(ctx, obj)
+
+        try:
+            self._delete_repository.delete(ctx, obj)
+        except Exception as e:
+            raise TranslatableException(
+                e, CAN_NOT_DELETE_NOW_MESSAGE, _code=NOT_FOUND_ERROR
+            )

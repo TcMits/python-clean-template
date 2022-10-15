@@ -24,6 +24,12 @@ class Fake:
         self.mock_funcs.append(mock_func)
         return self
 
+    def one(self, *args, **kwargs):
+        mock_func = MagicMock(return_value=self)
+        mock_func(*args, **kwargs)
+        self.mock_funcs.append(mock_func)
+        return self
+
     def order_by(self, *args, **kwargs):
         mock_func = MagicMock(return_value=self)
         mock_func(*args, **kwargs)

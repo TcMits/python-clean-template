@@ -33,7 +33,7 @@ class SimpleGetRepository(
         query = session.query(self._model_class).filter(*clauses)
         if with_for_update:
             query = query.with_for_update()
-        return query.first()
+        return query.one()
 
     def get(
         self, ctx: ContextVar[Dict[Any, Any]], *clauses: ClauseElement

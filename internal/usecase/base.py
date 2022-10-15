@@ -68,13 +68,19 @@ class LoginUseCase(
     Generic[ModelType, LoginInputType, AuthenticatedPayloadType, RefreshTokenInputType],
 ):
     @abstractmethod
-    def login(self, login_input: LoginInputType) -> AuthenticatedPayloadType:
+    def login(
+        self, ctx: ContextVar[Dict[Any, Any]], login_input: LoginInputType
+    ) -> AuthenticatedPayloadType:
         pass
 
     @abstractmethod
-    def verify_token(self, token: str) -> ModelType:
+    def verify_token(self, ctx: ContextVar[Dict[Any, Any]], token: str) -> ModelType:
         pass
 
     @abstractmethod
-    def refresh_token(self, refresh_token_input: RefreshTokenInputType) -> str:
+    def refresh_token(
+        self,
+        ctx: ContextVar[Dict[Any, Any]],
+        refresh_token_input: RefreshTokenInputType,
+    ) -> str:
         pass

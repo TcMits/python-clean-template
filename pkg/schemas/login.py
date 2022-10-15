@@ -7,8 +7,8 @@ class LoginInput(BaseModel):
 
     @validator("username")
     def validate_username(cls, v: str) -> str:
-        # if not v.isalnum():
-        #     raise
+        if not v.isalnum():
+            raise ValueError("pkg.schemas.login: username is not alnum")
         return v
 
 
