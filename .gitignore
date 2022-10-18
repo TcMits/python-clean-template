@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.DS_Store
 
 # C extensions
 *.so
@@ -109,6 +110,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.envs/.production/*
+!.envs/.production/*.sample
 
 # Spyder project settings
 .spyderproject

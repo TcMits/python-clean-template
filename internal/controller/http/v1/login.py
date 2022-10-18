@@ -1,9 +1,10 @@
-from typing import Callable, Type, TypeVar
+from typing import Callable, Type, TypeVar, Union
 
 import starlette_context
-from fastapi import Body, FastAPI, Request, status
+from fastapi import APIRouter, FastAPI, Request, Response, status
 from pydantic import BaseModel
 
+from internal.controller.http.v1.request import VerifyTokenRequest
 from internal.controller.http.v1.response import RefreshTokenResponse
 from internal.usecase.base import LoginUseCase
 from pkg.models.base import Base
@@ -27,7 +28,7 @@ RefreshTokenInputType = TypeVar("RefreshTokenInputType", bound=BaseModel)
 
 
 def register_login_controller(
-    handler: FastAPI,
+    handler: Union[FastAPI, APIRouter],
     login_use_case: LoginUseCase[
         User, LoginInput, JWTAuthenticatedPayload, RefreshTokenInput
     ],
@@ -48,7 +49,7 @@ def register_login_controller(
         name=REFRESH_TOKEN_ROUTE_NAME,
         response_model=RefreshTokenResponse,
         status_code=status.HTTP_200_OK,
-    )(_get_refresh_token_handler(login_use_case))
+    )(_get_refresh_token_handler(RefreshTokenInput, login_use_case))
 
 
 def _get_login_handler(
@@ -72,11 +73,19 @@ def _get_verify_token_handler(
     login_use_case: LoginUseCase[
         ModelType, LoginInputType, AuthenticatedPayloadType, RefreshTokenInputType
     ],
-) -> Callable[[Request, str], None]:
-    async def verify_token(_: Request, token: str = Body()) -> None:
-        return login_use_case.verify_token(
-            starlette_context._request_scope_context_storage, token
-        )
+) -> Callable[[Request, str], Response]:
+    async def verify_token(
+        _: Request, verify_token_input: VerifyTokenRequest
+    ) -> Response:
+        if (
+            login_use_case.verify_token(
+                starlette_context._request_scope_context_storage,
+                verify_token_input.token,
+            )
+            is None
+        ):
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        return Response(status_code=status.HTTP_200_OK)
 
     return verify_token
 

@@ -29,8 +29,9 @@ class TranslatableException(Exception):
     def unwrap(self) -> Exception:
         return self._inner_exception
 
-    def set_translate_func(self, func: Callable[..., str]) -> None:
+    def set_translate_func(self, func: Callable[..., str]) -> "TranslatableException":
         self.__translate_func = func
+        return self
 
     @property
     def display_message(self) -> str:

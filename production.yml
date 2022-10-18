@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+    python:
+        build:
+            context: .
+            dockerfile: ./compose/production/python/Dockerfile
+        image: python
+        volumes:
+            - .:/app:z
+        env_file:
+            - ./.envs/.production/.py_env
+            - ./.envs/.production/.postgres
+        command: /start
+        depends_on:
+            postgres:
+                condition: service_healthy
+        ports:
+            - 8080:8080
+
+    postgres:
+        build:
+            context: .
+            dockerfile: ./compose/production/postgres/Dockerfile
+        image: postgres_db
+        volumes:
+            - db:/var/lib/postgresql/data:Z
+        env_file:
+            - ./.envs/.production/.postgres
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+volumes:
+    db:

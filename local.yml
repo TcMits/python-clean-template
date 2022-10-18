@@ -1,0 +1,40 @@
+version: "3.7"
+
+services:
+    python:
+        build:
+            context: .
+            dockerfile: ./compose/local/python/Dockerfile
+        image: python_dev
+        container_name: python_dev
+        volumes:
+            - .:/app:z
+        env_file:
+            - ./.envs/.local/.py_env
+            - ./.envs/.local/.postgres
+        command: /start
+        depends_on:
+            postgres:
+                condition: service_healthy
+        ports:
+            - 8080:8080
+
+    postgres:
+        build:
+            context: .
+            dockerfile: ./compose/local/postgres/Dockerfile
+        image: postgres_db_dev
+        container_name: postgres_db_dev
+        command: postgres -c log_destination=stderr -c log_connections=on -c max_connections=100 -c log_disconnections=on
+        volumes:
+            - db:/var/lib/postgresql/data:Z
+        env_file:
+            - ./.envs/.local/.postgres
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+volumes:
+    db:
