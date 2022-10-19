@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Coroutine
 
 from fastapi import Request, status
 from fastapi.exceptions import StarletteHTTPException
@@ -27,6 +27,16 @@ USECASE_INPUT_VALIDATION_ERROR = "USECASE_INPUT_VALIDATION_ERROR"
 ERROR_LOGGER_NAME = "gunicorn.error"
 
 logger = logging.getLogger(ERROR_LOGGER_NAME)
+
+BAD_STATUS_CODES = (
+    status.HTTP_500_INTERNAL_SERVER_ERROR,
+    status.HTTP_406_NOT_ACCEPTABLE,
+    status.HTTP_404_NOT_FOUND,
+    status.HTTP_400_BAD_REQUEST,
+    status.HTTP_401_UNAUTHORIZED,
+    status.HTTP_403_FORBIDDEN,
+    status.HTTP_422_UNPROCESSABLE_ENTITY,
+)
 
 __STATUS_CODE_MAP = {
     UNKNOWN_ERROR: status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -70,7 +80,9 @@ def _get_default_code(exc: Exception) -> str:
     return code
 
 
-async def exception_handler(_: Request, exc: Exception) -> JSONResponse:
+async def exception_handler(
+    _: Request, exc: Exception
+) -> Coroutine[None, None, JSONResponse]:
     code = getattr(exc, "code", _get_default_code(exc))
     headers = getattr(exc, "headers", None)
     detail = getattr(exc, "detail", str(exc))

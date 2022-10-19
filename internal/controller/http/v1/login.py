@@ -1,4 +1,4 @@
-from typing import Callable, Type, TypeVar, Union
+from typing import Callable, Coroutine, Type, TypeVar, Union
 
 import starlette_context
 from fastapi import APIRouter, FastAPI, Request, Response, status
@@ -21,6 +21,10 @@ LOGIN_ROUTE_NAME = "login"
 VERIFY_TOKEN_ROUTE_NAME = "verify_token"
 REFRESH_TOKEN_ROUTE_NAME = "refresh_token"
 
+# tag names
+LOGIN_TAG_NAME = "login"
+
+
 ModelType = TypeVar("ModelType", bound=Base)
 LoginInputType = TypeVar("LoginInputType", bound=BaseModel)
 AuthenticatedPayloadType = TypeVar("AuthenticatedPayloadType", bound=BaseModel)
@@ -38,17 +42,20 @@ def register_login_controller(
         name=LOGIN_ROUTE_NAME,
         response_model=JWTAuthenticatedPayload,
         status_code=status.HTTP_200_OK,
+        tags=[LOGIN_TAG_NAME],
     )(_get_login_handler(LoginInput, JWTAuthenticatedPayload, login_use_case))
     handler.post(
         VERIFY_TOKEN_SUBPATH,
         name=VERIFY_TOKEN_ROUTE_NAME,
         status_code=status.HTTP_200_OK,
+        tags=[LOGIN_TAG_NAME],
     )(_get_verify_token_handler(login_use_case))
     handler.post(
         REFRESH_TOKEN_SUBPATH,
         name=REFRESH_TOKEN_ROUTE_NAME,
         response_model=RefreshTokenResponse,
         status_code=status.HTTP_200_OK,
+        tags=[LOGIN_TAG_NAME],
     )(_get_refresh_token_handler(RefreshTokenInput, login_use_case))
 
 
@@ -58,10 +65,12 @@ def _get_login_handler(
     login_use_case: LoginUseCase[
         ModelType, LoginInputType, AuthenticatedPayloadType, RefreshTokenInputType
     ],
-) -> Callable[[Request, LoginInputType], AuthenticatedPayloadType]:
+) -> Callable[
+    [Request, LoginInputType], Coroutine[None, None, AuthenticatedPayloadType]
+]:
     async def login(
         _: Request, login_input: login_input_type
-    ) -> authenticated_payload_type:
+    ) -> Coroutine[None, None, authenticated_payload_type]:
         return login_use_case.login(
             starlette_context._request_scope_context_storage, login_input
         )
@@ -73,10 +82,10 @@ def _get_verify_token_handler(
     login_use_case: LoginUseCase[
         ModelType, LoginInputType, AuthenticatedPayloadType, RefreshTokenInputType
     ],
-) -> Callable[[Request, str], Response]:
+) -> Callable[[Request, str], Coroutine[None, None, Response]]:
     async def verify_token(
         _: Request, verify_token_input: VerifyTokenRequest
-    ) -> Response:
+    ) -> Coroutine[None, None, Response]:
         if (
             login_use_case.verify_token(
                 starlette_context._request_scope_context_storage,
@@ -95,10 +104,12 @@ def _get_refresh_token_handler(
     login_use_case: LoginUseCase[
         ModelType, LoginInputType, AuthenticatedPayloadType, RefreshTokenInputType
     ],
-) -> Callable[[Request, RefreshTokenInputType], RefreshTokenResponse]:
+) -> Callable[
+    [Request, RefreshTokenInputType], Coroutine[None, None, RefreshTokenResponse]
+]:
     async def refresh_token(
         _: Request, refresh_token_input: refresh_token_input_type
-    ) -> RefreshTokenResponse:
+    ) -> Coroutine[None, None, RefreshTokenResponse]:
         return RefreshTokenResponse(
             token=login_use_case.refresh_token(
                 starlette_context._request_scope_context_storage, refresh_token_input

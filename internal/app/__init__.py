@@ -47,7 +47,7 @@ def run(project_root: str, settings: Settings) -> None:
     # handlers = __load(project_root, settings, engine, reload=False)
 
     worker_class = "uvicorn.workers.UvicornWorker"
-    if settings.GUNICORN_RELOAD:
+    if settings.GUNICORN_RELOAD:  # set False in production
         # reload does not work for uvicorn.workers.UvicornWorker
         # https://github.com/benoitc/gunicorn/issues/2339
         worker_class = "pkg.infrastructure.worker.uvicorn.RestartableUvicornWorker"
