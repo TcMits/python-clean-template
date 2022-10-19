@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseSettings, PostgresDsn
 
-__settings: Optional["Settings"] = None
+__SETTINGS: Optional["Settings"] = None
 
 
 class Settings(BaseSettings):
@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
 
 def get_settings() -> Settings:
-    global __settings
-    if __settings is None:
-        __settings = Settings()
-    return __settings.copy()
+    global __SETTINGS
+    if __SETTINGS is None:
+        __SETTINGS = Settings()
+    return __SETTINGS.copy()

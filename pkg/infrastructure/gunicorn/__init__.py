@@ -8,14 +8,14 @@ from starlette.types import Receive, Scope, Send
 class GunicornApplication(gunicorn.app.base.BaseApplication):
     def __init__(
         self,
-        handler: Callable[[Scope, Receive, Send], Any],
+        loader: Callable[[], Callable[[Scope, Receive, Send], Any]],
         options: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> None:
         self.options = options or {}
-        self.application = handler
+        self.__loader = loader
         super().__init__()
 
-    def load_config(self):
+    def load_config(self) -> None:
         config = {
             key: value
             for key, value in self.options.items()
@@ -24,5 +24,5 @@ class GunicornApplication(gunicorn.app.base.BaseApplication):
         for key, value in config.items():
             self.cfg.set(key.lower(), value)
 
-    def load(self):
-        return self.application
+    def load(self) -> None:
+        return self.__loader()

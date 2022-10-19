@@ -52,7 +52,7 @@ __LOG_FUNC_MAP = {
 
 def _log_exception(exc: Exception, code: str) -> None:
     log_func = __LOG_FUNC_MAP.get(code, logger.error)
-    return log_func(str(exc))
+    log_func(str(exc))
 
 
 def _translate_func(message: Message, *args: Any, **kwargs: Any) -> str:  # noqa: ANN401
