@@ -1,9 +1,12 @@
+import gettext
+import os
 from typing import Optional, Tuple
 
 from fastapi import FastAPI
 from sqlalchemy.engine import Engine
 
 from config import Settings
+from pkg import gettext as gettext_manager
 from pkg.infrastructure.datastore import postgres
 from pkg.infrastructure.gunicorn import GunicornApplication
 
@@ -42,6 +45,13 @@ def __load(
 
 
 def run(project_root: str, settings: Settings) -> None:
+    # i18n
+    en_US = gettext.translation(
+        "messages", os.path.join(project_root, "locales"), languages=["en-US"]
+    )
+    # add more languages here
+    gettext_manager.add_translation("en-US", en_US)
+
     engine: Engine = postgres.get_engine(settings.DATABASE_URL, settings.POOL_SIZE)
     # you can fork for each handler, but i only have 1 http service now
     # handlers = __load(project_root, settings, engine, reload=False)

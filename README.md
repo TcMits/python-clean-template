@@ -22,6 +22,21 @@ Unit tests (can be run in CI):
 pytest -v --ignore=./integration_test/
 ```
 
+Generate `pot` files:
+```sh
+pybabel extract --keywords=_m -o ./locales/en-US/{filename}.pot ./**/i18n_messages.py
+```
+
+Generate `po` files:
+```sh
+pybabel init -i ./locales/en-US/{filename}.pot -o ./locales/en-US/LC_MESSAGES/messages.po -l en_US
+```
+
+Generate `mo` files:
+```sh
+pybabel compile -i ./locales/en-US/LC_MESSAGES/messages.po -o ./locales/en-US/LC_MESSAGES/messages.mo -l en_US
+```
+
 ## Overview
 
 ### Web framework
