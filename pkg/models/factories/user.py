@@ -7,7 +7,7 @@ from pkg.models.user import User
 class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = User
-        sqlalchemy_session = connection._FACTORY_SESSION
+        sqlalchemy_session = connection.get_factory_session()
 
     username = factory.Sequence(lambda n: "username%d" % n)
     password = None

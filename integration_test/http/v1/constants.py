@@ -1,6 +1,5 @@
 # REST
-HOST = "http://python"
-PORT = "8000"
+HOST = "http://python:8080"
 HEAL_PATH = HOST + "/ping"
 
 V1_SUBPATH = "/api/v1"

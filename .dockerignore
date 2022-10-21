@@ -16,6 +16,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.envs/
+
 
 # Sublime Text #
 *.tmlanguage.cache

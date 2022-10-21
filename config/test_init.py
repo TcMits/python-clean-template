@@ -10,7 +10,7 @@ def test_get_settings(mocker):
     settings_1 = get_settings()
     assert settings_1.DATABASE_URL == database_url
     assert settings_1.POOL_SIZE == 100
-    assert settings_1.GUNICORN_BIND_ADDR == "0.0.0.0:8000"
+    assert settings_1.GUNICORN_BIND_ADDR == "0.0.0.0:8080"
     assert settings_1.GUNICORN_WORKERS == 1
     assert settings_1.GUNICORN_THREADS == 2
     assert settings_1.GUNICORN_RELOAD == False

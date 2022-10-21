@@ -22,7 +22,7 @@ def configure_engine(bind: Engine) -> Generator[None, None, None]:
         __FACTORY_SESSION.configure(bind=None)
 
 
-def get_session(*args: Any, **kwargs: Any) -> orm.scoped_session:  # noqa: ANN401
+def get_session(*args: Any, **kwargs: Any) -> orm.Session:  # noqa: ANN401
     global __FACTORY_SESSION
 
     session_factory: orm.sessionmaker = __FACTORY_SESSION.session_factory
@@ -30,3 +30,7 @@ def get_session(*args: Any, **kwargs: Any) -> orm.scoped_session:  # noqa: ANN40
         raise ValueError("get_session can't be called outside configure_engine context")
 
     return __FACTORY_SESSION(*args, **kwargs)
+
+
+def get_factory_session() -> orm.scoped_session:
+    return __FACTORY_SESSION

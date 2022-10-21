@@ -35,7 +35,7 @@ class LoginUseCase(
         self, ctx: ContextVar[Dict[Any, Any]], payload: Dict[str, Any]
     ) -> User:
         id = payload.get("id", "")
-        jwt_token_key = payload.get("jwt_token_key", "")
+        jwt_token_key = payload.get("key", "")
         try:
             uuid_id = uuid.UUID(id)
         except (ValueError, TypeError) as e:

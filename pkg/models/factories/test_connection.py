@@ -1,3 +1,5 @@
+from sqlalchemy import orm
+
 from pkg.models.factories import connection
 
 
@@ -28,3 +30,7 @@ def test_connection_get_session():
 
     with connection.configure_engine(FakeEngine()):
         assert connection.get_session() is not None
+
+
+def test_connection_get_factory_session():
+    assert isinstance(connection.get_factory_session(), orm.scoped_session)

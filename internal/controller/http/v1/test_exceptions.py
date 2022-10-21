@@ -1,6 +1,6 @@
 import json
-from typing import Dict, List
 
+import pytest
 from fastapi import status
 from fastapi.exceptions import StarletteHTTPException
 from pydantic import ValidationError
@@ -15,7 +15,8 @@ from internal.controller.http.v1.i18n_messages import (
 from pkg.exceptions import UNKNOWN_ERROR
 
 
-def test_exception_handler_with_validation_error():
+@pytest.mark.asyncio
+async def test_exception_handler_with_validation_error():
     class FakeValidationError(ValidationError):
         def __init__(self) -> None:
             pass
@@ -26,7 +27,7 @@ def test_exception_handler_with_validation_error():
         def __str__(self) -> str:
             return "test"
 
-    resp = exception_handler(None, FakeValidationError())
+    resp = await exception_handler(None, FakeValidationError())
 
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
     assert json.loads(resp.body.decode("utf-8")) == {
@@ -36,9 +37,10 @@ def test_exception_handler_with_validation_error():
     }
 
 
-def test_exception_handler_with_http_exception():
+@pytest.mark.asyncio
+async def test_exception_handler_with_http_exception():
     exc = StarletteHTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="test")
-    resp = exception_handler(None, exc)
+    resp = await exception_handler(None, exc)
 
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
     assert json.loads(resp.body.decode("utf-8")) == {
@@ -48,9 +50,10 @@ def test_exception_handler_with_http_exception():
     }
 
 
-def test_exception_handler_with_value_error():
+@pytest.mark.asyncio
+async def test_exception_handler_with_value_error():
     exc = ValueError("test")
-    resp = exception_handler(None, exc)
+    resp = await exception_handler(None, exc)
 
     assert resp.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert json.loads(resp.body.decode("utf-8")) == {

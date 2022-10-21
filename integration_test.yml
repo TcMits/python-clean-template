@@ -5,11 +5,10 @@ services:
         build:
             context: .
             dockerfile: ./compose/production/python/Dockerfile
-        image: python
         env_file:
-            - ./.envs/.production/.py_env
-            - ./.envs/.production/.postgres
-        command: /start
+            - ./.envs/.integration_test/.py_env
+            - ./.envs/.integration_test/.postgres
+        command: /bin/bash -c "alembic upgrade head && /start"
         depends_on:
             postgres:
                 condition: service_healthy
@@ -22,16 +21,21 @@ services:
         build:
             context: .
             dockerfile: ./compose/production/postgres/Dockerfile
-        image: postgres_db
-        volumes:
-            - db:/var/lib/postgresql/data:Z
         env_file:
-            - ./.envs/.production/.postgres
+            - ./.envs/.integration_test/.postgres
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
             interval: 10s
             timeout: 5s
             retries: 5
 
-volumes:
-    db:
+    http_v1_integration:
+        build:
+            context: .
+            dockerfile: ./integration_test/http/v1/Dockerfile
+        env_file:
+            - ./.envs/.integration_test/.py_env
+            - ./.envs/.integration_test/.postgres
+        depends_on:
+            python:
+                condition: service_healthy
