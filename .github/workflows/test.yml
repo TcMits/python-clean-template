@@ -37,8 +37,7 @@ jobs:
         pip install -r requirements_dev.txt
     - name: Testing
       run: |
-        python -m pytest --cov=fastvector -v --ignore=./integration_test/ 
-        python -m codecov
+        python -m pytest -v --ignore=./integration_test/ 
 
   build-macos:
     runs-on: macos-latest
