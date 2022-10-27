@@ -6,7 +6,7 @@ fastapi==0.85.1
 pytest==7.2.0
 pytest-mock==3.10.0
 pytest-asyncio>=0.19
-PyJWT==2.5.0
+PyJWT==2.6.0
 bcrypt==4.0.1
 starlette-context==0.3.4
 asgiref==3.5.2
