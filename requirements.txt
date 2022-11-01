@@ -2,7 +2,7 @@ pydantic==v1.10.2
 sqlalchemy==1.4.42
 gunicorn==20.1.0
 uvicorn[standard]
-fastapi==0.85.1
+fastapi==0.85.2
 PyJWT==2.6.0
 bcrypt==4.0.1
 starlette-context==0.3.4
