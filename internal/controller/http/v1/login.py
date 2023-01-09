@@ -1,4 +1,4 @@
-from typing import Callable, Coroutine, Type, TypeVar, Union
+from typing import Any, Callable, Coroutine, Type, TypeVar, Union
 
 import starlette_context
 from fastapi import APIRouter, FastAPI, Request, Response, status
@@ -70,7 +70,7 @@ def _get_login_handler(
 ]:
     async def login(
         _: Request, login_input: login_input_type
-    ) -> Coroutine[None, None, authenticated_payload_type]:
+    ) -> authenticated_payload_type:
         return login_use_case.login(
             starlette_context._request_scope_context_storage, login_input
         )
@@ -85,7 +85,7 @@ def _get_verify_token_handler(
 ) -> Callable[[Request, str], Coroutine[None, None, Response]]:
     async def verify_token(
         _: Request, verify_token_input: VerifyTokenRequest
-    ) -> Coroutine[None, None, Response]:
+    ) -> Any:  # noqa: ANN401
         if (
             login_use_case.verify_token(
                 starlette_context._request_scope_context_storage,
@@ -109,7 +109,7 @@ def _get_refresh_token_handler(
 ]:
     async def refresh_token(
         _: Request, refresh_token_input: refresh_token_input_type
-    ) -> Coroutine[None, None, RefreshTokenResponse]:
+    ) -> RefreshTokenResponse:
         return RefreshTokenResponse(
             token=login_use_case.refresh_token(
                 starlette_context._request_scope_context_storage, refresh_token_input
