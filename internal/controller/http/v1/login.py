@@ -1,4 +1,4 @@
-from typing import Any, Callable, Coroutine, Type, TypeVar, Union
+from typing import Callable, Coroutine, Type, TypeVar, Union
 
 import starlette_context
 from fastapi import APIRouter, FastAPI, Request, Response, status
@@ -85,7 +85,7 @@ def _get_verify_token_handler(
 ) -> Callable[[Request, str], Coroutine[None, None, Response]]:
     async def verify_token(
         _: Request, verify_token_input: VerifyTokenRequest
-    ) -> Any:  # noqa: ANN401
+    ) -> Response:
         if (
             login_use_case.verify_token(
                 starlette_context._request_scope_context_storage,
